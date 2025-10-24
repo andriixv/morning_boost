@@ -1,0 +1,53 @@
+(function() {
+    const STORAGE_KEY = 'productiveMorningData_v3';
+    const appData = JSON.parse(localStorage.getItem(STORAGE_KEY));
+
+    if (!appData) {
+        alert("Дані додатка ще не створені. Спочатку відкрий додаток хоча б раз.");
+        return;
+    }
+
+    // === ФУНКЦІЯ ДОДАВАННЯ ДАНИХ ЗАДНІМ ЧИСЛОМ ===
+    window.addRecordForDate = function(dateString, options = {}) {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+            console.error("❌ Невірний формат дати! Використовуйте YYYY-MM-DD, наприклад '2025-10-20'");
+            return;
+        }
+
+        const record = {
+            goals: options.goalsCount ?? 3,
+            completed: options.completedCount ?? 0,
+        };
+
+        // Зберігаємо записи про цілі
+        appData.dailyRecords[dateString] = record;
+
+        // Настрій (опціонально)
+        if (options.mood) {
+            appData.moods[dateString] = options.mood;
+        }
+
+        // Вдячність (опціонально)
+        if (options.gratitude) {
+            if (!appData.pastGratitudes) appData.pastGratitudes = {};
+            appData.pastGratitudes[dateString] = options.gratitude;
+        }
+
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+        console.log(`✅ Дані за ${dateString} успішно додано або оновлено.`);
+        console.table(record);
+        if (options.mood) console.log("Настрій:", options.mood);
+        if (options.gratitude) console.log("Вдячність:", options.gratitude);
+    };
+
+    console.log(`
+✅ Скрипт для додавання даних "заднім числом" активовано.
+Використання прикладу:
+addRecordForDate("2025-10-20", {
+    goalsCount: 3,
+    completedCount: 2,
+    mood: "😊",
+    gratitude: "За гарний день і каву ☕"
+});
+`);
+})();
