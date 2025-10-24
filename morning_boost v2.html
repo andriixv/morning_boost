@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мій Продуктивний Ранок</title>
+    <style>
+        /* --- Загальні стилі та мінімалізм --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap');
+
+        :root {
+            --primary-color: #333;
+            --secondary-color: #777;
+            --background-color: #f4f4f9;
+            --card-background: #ffffff;
+            --accent-color: #6a89cc;
+            --border-color: #e0e0e0;
+            --success-color: #4caf50;
+            --motivation-color: #f39c12;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        body.theme-dawn {
+             background: linear-gradient(135deg, #FFDAB9 0%, #FFF0F5 100%);
+        }
+        body.theme-sky {
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+        }
+        body.theme-graphite {
+            --primary-color: #f0f0f0;
+            --secondary-color: #bbb;
+            --background-color: #2c3e50;
+            --card-background: #34495e;
+            --border-color: #4a627a;
+            --success-color: #2ecc71;
+            --motivation-color: #f1c40f;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--background-color);
+            color: var(--primary-color);
+            line-height: 1.6;
+            padding: 20px;
+            transition: background-color 0.5s ease;
+        }
+
+        .container { max-width: 800px; margin: 0 auto; display: grid; gap: 25px; }
+        .card {
+            background-color: var(--card-background);
+            border-radius: 12px;
+            padding: 25px 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        h1, h2, h3 { font-weight: 600; }
+        h1 { font-size: 2.5rem; margin-bottom: 5px; }
+        h1 .user-name { cursor: pointer; border-bottom: 2px dotted var(--accent-color); }
+        h2 {
+            font-size: 1.5rem; color: var(--primary-color); margin-bottom: 20px;
+            border-bottom: 2px solid var(--accent-color); padding-bottom: 5px; display: inline-block;
+        }
+        h3 { font-size: 1.1rem; margin-bottom: 10px; color: var(--secondary-color); }
+        p, span { color: var(--secondary-color); font-size: 1rem; }
+        blockquote { font-size: 1.1rem; font-style: italic; border-left: 4px solid var(--accent-color); padding-left: 15px; margin: 0; }
+
+        /* --- Цілі --- */
+        .goals-list { list-style: none; }
+        .goal-item { display: flex; align-items: center; margin-bottom: 12px; cursor: pointer; }
+        .goal-checkbox {
+            width: 22px; height: 22px; border: 2px solid var(--border-color);
+            border-radius: 50%; margin-right: 15px; flex-shrink: 0;
+            transition: all 0.3s ease; position: relative;
+        }
+        .goal-item.completed .goal-checkbox { background-color: var(--success-color); border-color: var(--success-color); }
+        .goal-item.completed .goal-checkbox::after {
+            content: '✓'; color: white; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); font-weight: bold;
+        }
+        input.goal-text {
+            width: 100%; border: none; border-bottom: 1px solid transparent;
+            font-size: 1rem; background-color: transparent; color: var(--primary-color);
+        }
+        .goal-item.completed input.goal-text { text-decoration: line-through; color: var(--secondary-color); }
+        input.goal-text:focus { outline: none; border-bottom-color: var(--accent-color); }
+
+        /* --- Статистика цілей --- */
+        .goal-stats { margin-top: 25px; }
+        #statsText { font-size: 0.95rem; line-height: 1.5; }
+        .motivation-quote { color: var(--motivation-color); font-style: italic; display: block; margin-top: 8px; }
+        .progress-bar-container {
+            width: 100%; height: 12px; background-color: var(--border-color);
+            border-radius: 6px; overflow: hidden; margin-top: 10px;
+        }
+        .progress-bar-fill {
+            height: 100%; width: 0%; background-color: var(--success-color);
+            border-radius: 6px; transition: width 0.5s ease-in-out;
+        }
+
+        /* --- Вдячність та Настрій --- */
+        textarea {
+            width: 100%; border: 1px solid var(--border-color); padding: 10px;
+            font-size: 1rem; font-family: 'Montserrat', sans-serif; background-color: transparent;
+            color: var(--primary-color); transition: border-color 0.3s ease;
+            border-radius: 8px; resize: vertical; min-height: 70px;
+        }
+        textarea:focus { outline: none; border-color: var(--accent-color); }
+        .mood-selector { display: flex; justify-content: space-around; margin: 20px 0; }
+        .mood-icon { font-size: 2.5rem; cursor: pointer; transition: transform 0.2s ease, filter 0.2s; filter: grayscale(80%); opacity: 0.7; }
+        .mood-icon:hover, .mood-icon.selected { transform: scale(1.2); filter: grayscale(0%); opacity: 1; }
+        .mood-chart { display: flex; justify-content: space-between; text-align: center; margin-top: 15px; }
+        .mood-day { display: flex; flex-direction: column; align-items: center; font-size: 0.8rem; color: var(--secondary-color); }
+        .mood-day .emoji { font-size: 1.8rem; margin-top: 5px; }
+        
+        /* --- Натхнення та Lightbox --- */
+        .inspiration-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .inspiration-gallery img { width: 100%; height: 100px; object-fit: cover; border-radius: 8px; cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s; }
+        .inspiration-gallery img:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); }
+        .lightbox-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); display: none; justify-content: center; align-items: center; z-index: 1000; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .lightbox-content { max-width: 90%; max-height: 85%; border-radius: 10px; box-shadow: 0 0 40px rgba(0,0,0,0.5); animation: zoomIn 0.3s ease; }
+        @keyframes zoomIn { from { transform: scale(0.8); } to { transform: scale(1); } }
+        .lightbox-close { position: absolute; top: 20px; right: 30px; color: white; font-size: 40px; font-weight: bold; cursor: pointer; }
+
+        /* --- Персоналізація --- */
+        .personalization { display: flex; gap: 10px; align-items: center; }
+        .theme-button { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--border-color); cursor: pointer; transition: transform 0.2s; }
+        .theme-button:hover { transform: scale(1.1); }
+        #btn-default { background-color: #f4f4f9; } #btn-dawn { background: linear-gradient(45deg, #FFDAB9, #FFF0F5); }
+        #btn-sky { background: linear-gradient(45deg, #a1c4fd, #c2e9fb); } #btn-graphite { background-color: #2c3e50; }
+
+        /* --- Модальне вікно (НОВЕ) --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6);
+            display: flex; justify-content: center; align-items: center; z-index: 2000;
+        }
+        .modal-content {
+            background: var(--card-background); padding: 30px 40px; border-radius: 12px;
+            text-align: center; box-shadow: 0 5px 25px rgba(0,0,0,0.2); width: 90%; max-width: 400px;
+        }
+        .modal-content h2 { border: none; }
+        .modal-content input {
+            border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;
+            margin: 15px 0; text-align: center; font-size: 1.1rem;
+        }
+        .modal-content input:focus { border-color: var(--accent-color); outline: none; }
+        .modal-button {
+            background-color: var(--accent-color); color: white; border: none;
+            padding: 12px 25px; border-radius: 8px; font-size: 1rem;
+            cursor: pointer; transition: background-color 0.3s;
+        }
+        .modal-button:hover { background-color: #5572b1; }
+        .hidden { display: none !important; }
+
+        @media (max-width: 600px) {
+            body { padding: 10px; } .container { gap: 15px; } .card { padding: 20px; }
+            h1 { font-size: 2rem; } h2 { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="container">
+        <header class="card">
+            <h1>Доброго ранку, <span class="user-name" id="userName"></span>!</h1>
+            <p id="currentDate"></p>
+        </header>
+        <section class="card">
+            <h2>Цитата дня</h2>
+            <blockquote id="quote"></blockquote>
+        </section>
+        <section class="card">
+            <h2>Три головні цілі на сьогодні</h2>
+            <ul class="goals-list" id="goalsList"></ul>
+            <div class="goal-stats">
+                <h3>Статистика за тиждень</h3>
+                <p id="statsText"></p>
+                <div class="progress-bar-container">
+                    <div id="progressBar" class="progress-bar-fill"></div>
+                </div>
+            </div>
+        </section>
+        <section class="card">
+            <h2>Ранкова вдячність</h2>
+            <textarea id="gratitude" placeholder="Сьогодні я вдячний(а) за..."></textarea>
+        </section>
+        <section class="card">
+            <h2>Як ти почуваєшся сьогодні?</h2>
+            <div class="mood-selector" id="moodSelector">
+                <span class="mood-icon" data-mood="🤩">🤩</span> <span class="mood-icon" data-mood="😊">😊</span>
+                <span class="mood-icon" data-mood="😐">😐</span> <span class="mood-icon" data-mood="😕">😕</span>
+                <span class="mood-icon" data-mood="😴">😴</span>
+            </div>
+            <h3>Твій настрій за тиждень:</h3>
+            <div class="mood-chart" id="moodChart"></div>
+        </section>
+        <section class="card">
+            <h2>Натхнення</h2>
+            <div class="inspiration-gallery" id="inspirationGallery">
+                <img src="https://images.pexels.com/photos/32237/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Sunrise photo 1">
+                <img src="https://images.pexels.com/photos/733997/pexels-photo-733997.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Sunrise photo 2">
+                <img src="https://images.pexels.com/photos/1687675/pexels-photo-1687675.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Sunrise photo 3">
+                <img src="https://images.pexels.com/photos/36717/amazing-animal-beautiful-beautifull.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Sunrise photo 4">
+            </div>
+        </section>
+        <footer class="card">
+            <h2>Персоналізація</h2>
+            <div class="personalization">
+                <span>Оберіть тему:</span>
+                <button class="theme-button" id="btn-default" data-theme="default"></button>
+                <button class="theme-button" id="btn-dawn" data-theme="theme-dawn"></button>
+                <button class="theme-button" id="btn-sky" data-theme="theme-sky"></button>
+                <button class="theme-button" id="btn-graphite" data-theme="theme-graphite"></button>
+            </div>
+        </footer>
+    </main>
+    
+    <div id="lightbox" class="lightbox-overlay hidden">
+        <span class="lightbox-close">&times;</span>
+        <img id="lightboxImage" class="lightbox-content" src="">
+    </div>
+    
+    <div id="nameModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2>Ласкаво просимо!</h2>
+            <p>Як до вас звертатись?</p>
+            <input type="text" id="nameInput" placeholder="Введіть ваше ім'я">
+            <button id="saveNameBtn" class="modal-button">Зберегти</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Elements ---
+            const dom = {
+                userName: document.getElementById('userName'),
+                currentDate: document.getElementById('currentDate'),
+                quote: document.getElementById('quote'),
+                goalsList: document.getElementById('goalsList'),
+                gratitude: document.getElementById('gratitude'),
+                moodSelector: document.getElementById('moodSelector'),
+                moodChart: document.getElementById('moodChart'),
+                themeButtons: document.querySelectorAll('.theme-button'),
+                statsText: document.getElementById('statsText'),
+                progressBar: document.getElementById('progressBar'),
+                gallery: document.getElementById('inspirationGallery'),
+                lightbox: document.getElementById('lightbox'),
+                lightboxImage: document.getElementById('lightboxImage'),
+                lightboxClose: document.querySelector('.lightbox-close'),
+                nameModal: document.getElementById('nameModal'),
+                nameInput: document.getElementById('nameInput'),
+                saveNameBtn: document.getElementById('saveNameBtn'),
+            };
+
+            const quotes = [
+                "Найкращий спосіб почати — це перестати говорити і почати робити.",
+                "Ваше майбутнє створюється тим, що ви робите сьогодні, а не завтра.",
+                "Єдиний спосіб зробити велику роботу — це любити те, що ви робите.",
+                "Успіх — це сума маленьких зусиль, що повторюються день у день."
+            ];
+            
+            const motivation = [
+                "Кожен крок важливий. Продовжуй рухатись вперед!",
+                "Ти можеш більше, ніж думаєш. Не зупиняйся!",
+                "Маленька перемога сьогодні — великий успіх завтра.",
+                "Навіть одна виконана ціль — це вже прогрес."
+            ];
+
+            const STORAGE_KEY = 'productiveMorningData_v3';
+            const getTodayDateString = () => new Date().toISOString().split('T')[0];
+
+            const defaultData = {
+                userName: null,
+                theme: 'default',
+                lastVisited: getTodayDateString(),
+                today: {
+                    goals: [ { text: '', completed: false }, { text: '', completed: false }, { text: '', completed: false } ],
+                    gratitude: '',
+                },
+                moods: {},
+                dailyRecords: {}
+            };
+
+            let appData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultData;
+            const saveData = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+
+            const handleNewDay = () => {
+                const todayStr = getTodayDateString();
+                if (appData.lastVisited !== todayStr) {
+                    const goalsSet = appData.today.goals.filter(g => g.text.trim() !== '').length;
+                    const goalsCompleted = appData.today.goals.filter(g => g.completed).length;
+                    
+                    if (goalsSet > 0) {
+                        appData.dailyRecords[appData.lastVisited] = { goals: goalsSet, completed: goalsCompleted };
+                    }
+                    
+                    appData.today = JSON.parse(JSON.stringify(defaultData.today));
+                    appData.lastVisited = todayStr;
+                    saveData();
+                }
+            };
+            
+            const renderGoals = () => {
+                dom.goalsList.innerHTML = '';
+                appData.today.goals.forEach((goal, index) => {
+                    const li = document.createElement('li');
+                    li.className = `goal-item ${goal.completed ? 'completed' : ''}`;
+                    li.dataset.index = index;
+                    li.innerHTML = `
+                        <span class="goal-checkbox"></span>
+                        <input type="text" class="goal-text" placeholder="Моя ${['перша', 'друга', 'третя'][index]} ціль..." value="${goal.text}">
+                    `;
+                    dom.goalsList.appendChild(li);
+                });
+            };
+            
+            const renderGoalStats = () => {
+                let totalGoals = 0, completedGoals = 0;
+                for (let i = 0; i < 7; i++) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    const record = appData.dailyRecords[date.toISOString().split('T')[0]];
+                    if (record) {
+                        totalGoals += record.goals;
+                        completedGoals += record.completed;
+                    }
+                }
+
+                const todayGoals = appData.today.goals.filter(g => g.text.trim() !== '').length;
+                const todayCompleted = appData.today.goals.filter(g => g.completed).length;
+                
+                totalGoals += todayGoals;
+                completedGoals += todayCompleted;
+                
+                const uncompleted = totalGoals - completedGoals;
+
+                if (totalGoals === 0) {
+                    dom.statsText.textContent = 'Заплануйте цілі, щоб бачити прогрес.';
+                    dom.progressBar.style.width = '0%';
+                } else {
+                    const percentage = Math.round((completedGoals / totalGoals) * 100);
+                    let statsHTML = `Виконано <b>${completedGoals}</b> з <b>${totalGoals}</b> цілей за тиждень.`;
+                    if (uncompleted > 0) {
+                        statsHTML += ` Ще залишилось ${uncompleted}.`;
+                        const motQuote = motivation[uncompleted % motivation.length];
+                        statsHTML += `<span class="motivation-quote">${motQuote}</span>`;
+                    }
+                    dom.statsText.innerHTML = statsHTML;
+                    dom.progressBar.style.width = `${percentage}%`;
+                }
+            };
+
+            const renderUI = () => {
+                document.body.className = appData.theme || '';
+                dom.userName.textContent = appData.userName || 'друже';
+                const today = new Date();
+                dom.currentDate.textContent = today.toLocaleString('uk-UA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+                dom.quote.textContent = quotes[dayOfYear % quotes.length];
+
+                renderGoals();
+                dom.gratitude.value = appData.today.gratitude || '';
+
+                renderMoodChart();
+                highlightSelectedMood();
+                renderGoalStats();
+            };
+
+            const renderMoodChart = () => {
+                 dom.moodChart.innerHTML = '';
+                const weekDays = ['Нд', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+                for (let i = 6; i >= 0; i--) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    const dateString = date.toISOString().split('T')[0];
+                    const dayOfWeek = weekDays[date.getDay()];
+                    const mood = appData.moods[dateString] || '⚪️';
+                    dom.moodChart.insertAdjacentHTML('beforeend', `<div class="mood-day"><span>${dayOfWeek}</span><span class="emoji">${mood}</span></div>`);
+                }
+            };
+
+            const highlightSelectedMood = () => {
+                const todayMood = appData.moods[getTodayDateString()];
+                document.querySelectorAll('.mood-icon').forEach(icon => {
+                    icon.classList.toggle('selected', icon.dataset.mood === todayMood);
+                });
+            };
+
+            const setupEventListeners = () => {
+                dom.userName.addEventListener('click', () => {
+                    const newName = prompt('Як вас звати?', appData.userName);
+                    if (newName && newName.trim() !== '') {
+                        appData.userName = newName.trim();
+                        dom.userName.textContent = appData.userName;
+                        saveData();
+                    }
+                });
+
+                dom.goalsList.addEventListener('input', e => {
+                    if (e.target.classList.contains('goal-text')) {
+                        const index = e.target.closest('.goal-item').dataset.index;
+                        appData.today.goals[index].text = e.target.value;
+                        saveData();
+                        renderGoalStats();
+                    }
+                });
+
+                dom.goalsList.addEventListener('click', e => {
+                    const goalItem = e.target.closest('.goal-item');
+                    if (goalItem && appData.today.goals[goalItem.dataset.index].text.trim()) {
+                        const index = goalItem.dataset.index;
+                        appData.today.goals[index].completed = !appData.today.goals[index].completed;
+                        goalItem.classList.toggle('completed');
+                        saveData();
+                        renderGoalStats();
+                    }
+                });
+
+                dom.gratitude.addEventListener('input', () => {
+                    appData.today.gratitude = dom.gratitude.value;
+                    saveData();
+                });
+
+                dom.moodSelector.addEventListener('click', e => {
+                    if (e.target.classList.contains('mood-icon')) {
+                        appData.moods[getTodayDateString()] = e.target.dataset.mood;
+                        saveData();
+                        renderMoodChart();
+                        highlightSelectedMood();
+                    }
+                });
+                
+                dom.themeButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        appData.theme = button.dataset.theme;
+                        document.body.className = appData.theme;
+                        saveData();
+                    });
+                });
+
+                // Lightbox
+                dom.gallery.addEventListener('click', e => {
+                    if (e.target.tagName === 'IMG') {
+                        dom.lightboxImage.src = e.target.src;
+                        dom.lightbox.classList.remove('hidden');
+                    }
+                });
+                const closeLightbox = () => dom.lightbox.classList.add('hidden');
+                dom.lightboxClose.addEventListener('click', closeLightbox);
+                dom.lightbox.addEventListener('click', e => { if (e.target === dom.lightbox) closeLightbox(); });
+                
+                // Modal
+                dom.saveNameBtn.addEventListener('click', () => {
+                    const newName = dom.nameInput.value.trim();
+                    if (newName) {
+                        appData.userName = newName;
+                        dom.userName.textContent = newName;
+                        saveData();
+                        dom.nameModal.classList.add('hidden');
+                    }
+                });
+                 dom.nameInput.addEventListener('keypress', (e) => {
+                     if (e.key === 'Enter') dom.saveNameBtn.click();
+                 });
+            };
+
+            // --- Main Initialization ---
+            handleNewDay();
+            renderUI();
+            setupEventListeners();
+            
+            // Show modal on first visit
+            if (!appData.userName) {
+                dom.nameModal.classList.remove('hidden');
+                dom.nameInput.focus();
+            }
+        });
+    </script>
+</body>
+</html>
